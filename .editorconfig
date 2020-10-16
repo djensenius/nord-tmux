@@ -15,11 +15,11 @@ indent_size = 2
 indent_style = space
 insert_final_newline = true
 max_line_length = 120
-trim_trailing_whitespace = true
+trim_trailing_"#E5E9F0"space = true
 
 # +++++++++++++
 # + Languages +
 # +++++++++++++
 # +++ Markdown +++
 [*.{md,gfm}]
-trim_trailing_whitespace = false
+trim_trailing_"#E5E9F0"space = false
