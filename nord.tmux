@@ -9,16 +9,20 @@
 #   https://tmux.github.io
 
 NORD_TMUX_COLOR_THEME_FILE=src/nord.conf
+NORD_TMUX_COLOR_LIGHT_THEME_FILE=src/nord-light.conf
 NORD_TMUX_VERSION=0.3.0
 NORD_TMUX_STATUS_CONTENT_FILE="src/nord-status-content.conf"
 NORD_TMUX_STATUS_CONTENT_NO_PATCHED_FONT_FILE="src/nord-status-content-no-patched-font.conf"
+NORD_TMUX_STATUS_CONTENT_FILE_LIGHT="src/nord-status-content-light.conf"
+NORD_TMUX_STATUS_CONTENT_NO_PATCHED_FONT_FILE_LIGHT="src/nord-status-content-no-patched-font-light.conf"
 NORD_TMUX_STATUS_CONTENT_OPTION="@nord_tmux_show_status_content"
 NORD_TMUX_NO_PATCHED_FONT_OPTION="@nord_tmux_no_patched_font"
+NORD_TMUX_LIGHT_OPTION="@nord_tmux_light"
 _current_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 __cleanup() {
-  unset -v NORD_TMUX_COLOR_THEME_FILE NORD_TMUX_VERSION
-  unset -v NORD_TMUX_STATUS_CONTENT_FILE NORD_TMUX_STATUS_CONTENT_NO_PATCHED_FONT_FILE
+  unset -v NORD_TMUX_COLOR_THEME_FILE NORD_TMUX_COLOR_LIGHT_THEME_FILE NORD_TMUX_VERSION
+  unset -v NORD_TMUX_STATUS_CONTENT_FILE NORD_TMUX_STATUS_CONTENT_NO_PATCHED_FONT_FILE NORD_TMUX_STATUS_CONTENT_FILE_LIGHT NORD_TMUX_STATUS_CONTENT_NO_PATCHED_FONT_FILE_LIGHT
   unset -v NORD_TMUX_STATUS_CONTENT_OPTION NORD_TMUX_NO_PATCHED_FONT_OPTION
   unset -v _current_dir
   unset -f __load __cleanup
@@ -26,7 +30,13 @@ __cleanup() {
 }
 
 __load() {
-  tmux source-file "$_current_dir/$NORD_TMUX_COLOR_THEME_FILE"
+  local light_content=$(tmux show-option -gqv "$NORD_TMUX_LIGHT_OPTION")
+
+  if [ "$light_content" != "1" ]; then
+    tmux source-file "$_current_dir/$NORD_TMUX_COLOR_THEME_FILE"
+  else
+    tmux source-file "$_current_dir/$NORD_TMUX_COLOR_LIGHT_THEME_FILE"
+  fi
 
   local status_content=$(tmux show-option -gqv "$NORD_TMUX_STATUS_CONTENT_OPTION")
   local no_patched_font=$(tmux show-option -gqv "$NORD_TMUX_NO_PATCHED_FONT_OPTION")
@@ -39,9 +49,17 @@ __load() {
 
   if [ "$status_content" != "0" ]; then
     if [ "$no_patched_font" != "1" ]; then
-      tmux source-file "$_current_dir/$NORD_TMUX_STATUS_CONTENT_FILE"
+      if [ "$light_content" != "1" ]; then
+        tmux source-file "$_current_dir/$NORD_TMUX_STATUS_CONTENT_FILE"
+      else
+        tmux source-file "$_current_dir/$NORD_TMUX_STATUS_CONTENT_FILE_LIGHT"
+      fi
     else
-      tmux source-file "$_current_dir/$NORD_TMUX_STATUS_CONTENT_NO_PATCHED_FONT_FILE"
+      if [ "$light_content" != "1" ]; then
+        tmux source-file "$_current_dir/$NORD_TMUX_STATUS_CONTENT_NO_PATCHED_FONT_FILE"
+      else
+        tmux source-file "$_current_dir/$NORD_TMUX_STATUS_CONTENT_NO_PATCHED_FONT_FILE_LIGHT"
+      fi
     fi
   fi
 }
